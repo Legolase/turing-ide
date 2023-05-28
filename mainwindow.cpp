@@ -69,7 +69,7 @@ void MainWindow::upload_slot()
     try {
         prg.set_program(editor.toPlainText().toStdString());
     } catch (bad_parse const& e) {
-        logs.append(QTime::currentTime().toString("hh:mm:ss $ ") + QString(e.what()));
+        logs.append(QTime::currentTime().toString("hh:mm:ss $ ") + "Error: " + QString(e.what()));
         return;
     }
     logs.append(QTime::currentTime().toString("hh:mm:ss $ ") + "Built successed");

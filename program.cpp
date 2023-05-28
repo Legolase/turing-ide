@@ -53,14 +53,15 @@ void program::thread_main()
             if (prog.has_value()) {
                 local_prog = std::move(*prog);
                 prog = std::nullopt;
-            } else if (restart) {
+            }
+            if (restart) {
                 restart = false;
                 local_prog.restart();
             }
         }
 
         result = local_prog.make_step(rib->get());
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
         if (result.first == -1) {
             set_stage(program_stage::STOP);
             continue;

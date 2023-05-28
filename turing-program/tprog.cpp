@@ -33,10 +33,19 @@ tprog::tprog(std::string const& text_code)
     action act;
     command from(0, 0), to(0,0);
 
+    // Set start stage
+    in_code >> word;
+    if (word != "start:") {
+        throw bad_parse("Program must set start stage");
+    }
+    in_code >> word;
+    stage2int[word] = 0;
+    int2stage.push_back(std::move(word));
+
     while (in_code >> word) {
         if (stage2int.find(word) == stage2int.end()) {
             stage2int[word] = int2stage.size();
-            int2stage.push_back(std::move(word));
+            int2stage.push_back(word);
         }
         from.stage = stage2int[word];
         in_code >> from.symbol;
