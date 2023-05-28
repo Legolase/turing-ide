@@ -10,7 +10,7 @@
 #include <QSplitter>
 #include "program.h"
 
-class MainWindow : public QWidget
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -41,7 +41,7 @@ private:
 
     QTextEdit editor;
     QTextEdit logs;
-    QVBoxLayout main_layer{this};
+    QVBoxLayout main_layer{};
     QHBoxLayout viewer{};
     QHBoxLayout buttons_rib{};
     QHBoxLayout buttons_prog{};

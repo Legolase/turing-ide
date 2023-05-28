@@ -7,7 +7,7 @@
 #include <QTime>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QWidget(parent)
+    : QMainWindow(parent)
 {
     editor.setFont(QFont("Consolas"));
     logs.setFont(QFont("Consolas"));
@@ -61,6 +61,10 @@ MainWindow::MainWindow(QWidget *parent)
     splitter->addWidget(&editor);
     splitter->addWidget(&logs);
     main_layer.setContentsMargins(0,0,0,0);
+
+    QWidget* main_widget = new QWidget();
+    main_widget->setLayout(&main_layer);
+    setCentralWidget(main_widget);
 }
 
 void MainWindow::upload_slot()
