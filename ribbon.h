@@ -5,6 +5,7 @@
 #include <QtGlobal>
 #include <QFont>
 #include <array>
+#include <mutex>
 
 class ribbon : public QWidget
 {
@@ -34,6 +35,7 @@ signals:
 private:
     uchar at(int index) noexcept;
 
+    mutable std::mutex m;
     storage_t arr{};
     int cursor{0};
 };

@@ -50,6 +50,8 @@ struct tprog {
 
     std::string get_current_stage() const;
 
+    void restart() noexcept;
+
 private:
     std::map<command, std::pair<command, action>> program_;
     std::vector<std::string> int2stage;

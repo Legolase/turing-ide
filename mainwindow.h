@@ -10,7 +10,7 @@
 #include <QSplitter>
 #include "program.h"
 
-class MainWindow : public QMainWindow
+class MainWindow : public QWidget
 {
     Q_OBJECT
 
@@ -20,6 +20,7 @@ public:
 
 private slots:
     void upload_slot();
+    void pause_slot();
     void stop_slot();
     void step_slot();
     void run_slot();
@@ -34,21 +35,21 @@ private:
     program prg{this, &r, &status, accesable};
 
     std::atomic<bool> accesable{true};
-    ribbon r{this};
+    ribbon r{};
     QLabel status;
 
 
     QTextEdit editor;
     QTextEdit logs;
-    QSplitter splitter{this};
-    QVBoxLayout main_layer{};
+    QVBoxLayout main_layer{this};
     QHBoxLayout viewer{};
     QHBoxLayout buttons_rib{};
     QHBoxLayout buttons_prog{};
 
-    QPushButton upload{"Load"};
+    QPushButton load{"Load"};
     QPushButton run{"Run"};
     QPushButton stop{"Stop"};
+    QPushButton pause{"Pause"};
     QPushButton step{"Step"};
 
     QPushButton lf{"<"};

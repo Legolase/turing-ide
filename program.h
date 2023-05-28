@@ -5,7 +5,6 @@
 #include <thread>
 #include <atomic>
 #include <condition_variable>
-#include <mutex>
 #include <QLabel>
 #include <optional>
 #include "ribbon.h"
@@ -14,6 +13,7 @@
 enum class program_stage : uchar {
     WORK,
     STEP,
+    PAUSE,
     STOP,
     EXIT
 };
@@ -37,6 +37,7 @@ private:
 
     std::mutex m;
     std::optional<tprog> prog{std::nullopt};
+    bool restart{false};
 
     ribbon* rib;
     QLabel* label;

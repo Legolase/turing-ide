@@ -18,11 +18,13 @@ ribbon::ribbon(QWidget *parent)
 
 uchar ribbon::get() const noexcept
 {
+    std::lock_guard lk(m);
     return arr[cursor];
 }
 
 void ribbon::move_right() noexcept
 {
+    std::lock_guard lk(m);
     if (++cursor >= SIZE) {
         cursor = 0;
     }
@@ -31,6 +33,7 @@ void ribbon::move_right() noexcept
 
 void ribbon::move_left() noexcept
 {
+    std::lock_guard lk(m);
     if (--cursor < 0) {
         cursor = SIZE - 1;
     }
@@ -39,12 +42,14 @@ void ribbon::move_left() noexcept
 
 void ribbon::set(uchar value) noexcept
 {
+    std::lock_guard lk(m);
     arr[cursor] = value;
     update();
 }
 
 void ribbon::paintEvent(QPaintEvent *e) noexcept
 {
+    std::lock_guard lk(m);
     const int width = this->width();
     const int height = HEIGHT;
     const int number_cells = width / BATCH;

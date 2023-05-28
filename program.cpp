@@ -19,15 +19,24 @@ void program::set_program(const std::string & code)
 {
     std::lock_guard lk(m);
     prog = tprog(code);
-    set_stage(program_stage::STOP);
+    set_stage(program_stage::PAUSE);
 }
 
 void program::set_stage(program_stage stg) noexcept
 {
-    if (stage_token != program_stage::EXIT) {
-        stage_token = stg;
-        program_updated.notify_one();
+    if (stage_token == program_stage::EXIT) {
+        return;
+    } else if (stg == program_stage::STOP) {
+        std::lock_guard lk(m);
+        restart = true;
     }
+    if (stg == program_stage::STOP ||
+        stg == program_stage::PAUSE ||
+        stg == program_stage::EXIT) {
+        free_ribbon = true;
+    }
+    stage_token = stg;
+    program_updated.notify_one();
 }
 
 void program::thread_main()
@@ -37,24 +46,23 @@ void program::thread_main()
     while(true) {
         {
             std::unique_lock ulk(m);
-            program_updated.wait(ulk, [this](){ return stage_token != program_stage::STOP; });
+            program_updated.wait(ulk, [this](){ return stage_token != program_stage::PAUSE && stage_token != program_stage::STOP; });
             if (stage_token == program_stage::EXIT) {
                 return;
             }
             if (prog.has_value()) {
                 local_prog = std::move(*prog);
                 prog = std::nullopt;
-            }
-            if (stage_token == program_stage::STEP) {
-                stage_token = program_stage::STOP;
+            } else if (restart) {
+                restart = false;
+                local_prog.restart();
             }
         }
 
         result = local_prog.make_step(rib->get());
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         if (result.first == -1) {
-            free_ribbon = true;
-            stage_token = program_stage::STOP;
+            set_stage(program_stage::STOP);
             continue;
         }
         rib->set(static_cast<uchar>(result.first));
@@ -63,6 +71,10 @@ void program::thread_main()
             rib->move_left();
         } else if (result.second == action::RIGHT) {
             rib->move_right();
+        }
+
+        if (stage_token == program_stage::STEP) {
+            set_stage(program_stage::PAUSE);
         }
     }
 }

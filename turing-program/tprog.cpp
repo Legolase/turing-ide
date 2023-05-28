@@ -33,33 +33,6 @@ tprog::tprog(std::string const& text_code)
     action act;
     command from(0, 0), to(0,0);
 
-    // Set start stage
-    in_code >> word;
-    if (word != "start:") {
-        throw bad_parse("Program must set start stage");
-    }
-    in_code >> word;
-    stage2int[word] = 0;
-    int2stage.push_back(std::move(word));
-
-    // Set accept stage
-    in_code >> word;
-    if (word != "accept:") {
-        throw bad_parse("Program must set accept stage");
-    }
-    in_code >> word;
-    stage2int[word] = 1;
-    int2stage.push_back(std::move(word));
-
-    // Set reject stage
-    in_code >> word;
-    if (word != "reject:") {
-        throw bad_parse("Program must set reject stage");
-    }
-    in_code >> word;
-    stage2int[word] = 2;
-    int2stage.push_back(std::move(word));
-
     while (in_code >> word) {
         if (stage2int.find(word) == stage2int.end()) {
             stage2int[word] = int2stage.size();
@@ -144,6 +117,11 @@ std::pair<int, action> tprog::make_step(uchar in) noexcept
 std::string tprog::get_current_stage() const
 {
     return int2stage[stage];
+}
+
+void tprog::restart() noexcept
+{
+    stage = 0;
 }
 
 bad_parse::bad_parse(const char *issue) noexcept : std::runtime_error(issue)
