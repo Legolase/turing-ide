@@ -31,6 +31,7 @@ public:
 
     void thread_main();
 
+    std::atomic<int> speed{500};
 private:
     std::atomic<program_stage> stage_token{program_stage::STOP};
     std::condition_variable program_updated;

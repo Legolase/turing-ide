@@ -61,7 +61,7 @@ void program::thread_main()
         }
 
         result = local_prog.make_step(rib->get());
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(speed));
         if (result.first == -1) {
             set_stage(program_stage::STOP);
             continue;

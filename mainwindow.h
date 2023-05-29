@@ -7,7 +7,10 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
-#include <QSplitter>
+#include <QAction>
+#include <QIcon>
+#include <QPixmap>
+#include <QSlider>
 #include "program.h"
 
 class MainWindow : public QMainWindow
@@ -28,6 +31,8 @@ private slots:
     void left_slot();
     void right_slot();
 
+    void move_speed(int);
+    void set_label_speed();
 protected:
     void keyPressEvent(QKeyEvent *event) noexcept override;
 
@@ -38,19 +43,21 @@ private:
     ribbon r{};
     QLabel status;
 
+    QSlider speed_slider{Qt::Horizontal};
+    QLabel speed;
+
 
     QTextEdit editor;
     QTextEdit logs;
     QVBoxLayout main_layer{};
     QHBoxLayout viewer{};
     QHBoxLayout buttons_rib{};
-    QHBoxLayout buttons_prog{};
 
-    QPushButton load{"Load"};
-    QPushButton run{"Run"};
-    QPushButton stop{"Stop"};
-    QPushButton pause{"Pause"};
-    QPushButton step{"Step"};
+    QAction* load;
+    QAction* run;
+    QAction* stop;
+    QAction* pause;
+    QAction* step;
 
     QPushButton lf{"<"};
     QPushButton rg{">"};

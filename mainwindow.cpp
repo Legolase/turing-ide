@@ -5,6 +5,8 @@
 #include <QRectF>
 #include <QTextOption>
 #include <QTime>
+#include <QToolBar>
+#include <QSplitter>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,6 +26,12 @@ MainWindow::MainWindow(QWidget *parent)
     p.setColor(QPalette::Base, QColor(30, 30, 30));
     p.setColor(QPalette::Text, Qt::white);
     logs.setPalette(p);
+
+    set_label_speed();
+    speed.setMinimumWidth(50);
+    speed.setFont(QFont{"Consolas", 15});
+    speed_slider.setRange(0, 1000);
+    speed_slider.setSliderPosition(prg.speed);
 //===
     logs.setReadOnly(true);
 
@@ -32,30 +40,40 @@ MainWindow::MainWindow(QWidget *parent)
     viewer.addWidget(&r, 1);
     viewer.addWidget(&status, 0, Qt::AlignHCenter | Qt::AlignVCenter);
 
-    buttons_rib.addWidget(&lf);
-    buttons_rib.addWidget(&rg);
+    buttons_rib.addWidget(&lf, 0);
+    buttons_rib.addWidget(&rg, 0);
+    buttons_rib.addWidget(&speed_slider, 1);
+    buttons_rib.addWidget(&speed, 0);
 
-    buttons_prog.addWidget(&run);
-    buttons_prog.addWidget(&stop);
-    buttons_prog.addWidget(&pause);
-    buttons_prog.addWidget(&step);
-    buttons_prog.addWidget(&load);
+    QToolBar* bar = addToolBar("ToolBar");
 
-    connect(&run, &QPushButton::clicked, this, &MainWindow::run_slot);
-    connect(&pause, &QPushButton::clicked, this, &MainWindow::pause_slot);
-    connect(&stop, &QPushButton::clicked, this, &MainWindow::stop_slot);
-    connect(&step, &QPushButton::clicked, this, &MainWindow::step_slot);
-    connect(&load, &QPushButton::clicked, this, &MainWindow::upload_slot);
+    run = bar->addAction(QIcon(QPixmap(":/image/source/Run.png")), "Run");
+    stop = bar->addAction(QIcon(QPixmap(":/image/source/Stop.png")), "Stop");
+    bar->addSeparator();
+    pause = bar->addAction(QIcon(QPixmap(":/image/source/Pause.png")), "Pause");
+    step = bar->addAction(QIcon(QPixmap(":/image/source/Step.png")), "Step");
+    bar->addSeparator();
+    load = bar->addAction(QIcon(QPixmap(":/image/source/Load.png")), "Load");
+
+    connect(run, &QAction::triggered, this, &MainWindow::run_slot);
+    connect(pause, &QAction::triggered, this, &MainWindow::pause_slot);
+    connect(stop, &QAction::triggered, this, &MainWindow::stop_slot);
+    connect(step, &QAction::triggered, this, &MainWindow::step_slot);
+    connect(load, &QAction::triggered, this, &MainWindow::upload_slot);
 
     connect(&lf, &QPushButton::clicked, this, &MainWindow::left_slot);
     connect(&rg, &QPushButton::clicked, this, &MainWindow::right_slot);
+
+//    connect(&speed_slider, &QSlider::valueChanged, &speed,
+//            static_cast<void (QLabel::*)(int)>(&QLabel::setNum));
+    connect(&speed_slider, &QSlider::valueChanged, this, &MainWindow::set_label_speed);
+    connect(&speed_slider, &QSlider::valueChanged, this, &MainWindow::move_speed);
 
     QSplitter* splitter = new QSplitter{};
     splitter->setOrientation(Qt::Vertical);
 
     main_layer.addLayout(&viewer, 0);
     main_layer.addLayout(&buttons_rib, 0);
-    main_layer.addLayout(&buttons_prog, 0);
     main_layer.addWidget(splitter, 1);
 
     splitter->addWidget(&editor);
@@ -117,6 +135,17 @@ void MainWindow::right_slot()
         return;
     }
     r.move_right();
+}
+
+void MainWindow::move_speed(int val)
+{
+    prg.speed = val;
+}
+
+void MainWindow::set_label_speed()
+{
+    static const QString ping("Ping: ");
+    speed.setText(ping + QString::number(speed_slider.value()));
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) noexcept
